@@ -1,0 +1,79 @@
+service: schulze-finances
+app: finances
+org: nschulze
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-west-2
+  timeout: 30
+  logRetentionInDays: 7
+  environment:
+    DYNAMODB_TABLE: !Ref InstitutionDynamoDbTable
+    PLAID_CLIENT_ID: ${param:plaid_client_id}
+    PLAID_KEY: ${param:plaid_key}
+    PLAID_SECRET: ${param:plaid_secret}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: !GetAtt InstitutionDynamoDbTable.Arn    
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      NotResource: 'arn:aws:sns:*:*:*'  
+functions:
+  spent:
+    handler: spent.handler
+    events:
+        - http: 
+            path: /spent
+            method: get
+            cors: true
+        - schedule: cron(15 15 * * ? *)
+
+  index:
+    handler: pages/index.handler
+    events:
+      - http:
+          path: /main
+          method: get
+          cors: true
+      - http:
+          path: /access_token
+          method: post
+          cors: true
+
+  static:
+    handler: pages/static.resoureces
+    events:
+      - http:
+          path: /styles
+          method: any
+          cors: true
+      - http:
+          path: /images/{image}
+          method: any
+          cors: true
+  
+resources:
+  Resources:
+    InstitutionDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: institutionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: institutionId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
