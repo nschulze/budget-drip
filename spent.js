@@ -45,12 +45,12 @@ module.exports.handler = async (event, context, callback) => {
     });
 
     let sender = 'budget';
-    await sendMessage(text, '+15153719995', sender);
-    await sendMessage(text, '+15156647893', sender);
+    await sendMessage(text, '+1**********', sender);
+    await sendMessage(text, '+1**********', sender);
 
     if(moment().day() === 0) {
-        await sendMessage(text2, '+15153719995', sender);
-        await sendMessage(text2, '+15156647893', sender);
+        await sendMessage(text2, '+1515**********', sender);
+        await sendMessage(text2, '+1515**********', sender);
     }
 
     const response = {
