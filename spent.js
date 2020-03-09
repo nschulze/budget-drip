@@ -49,8 +49,8 @@ module.exports.handler = async (event, context, callback) => {
     await sendMessage(text, '+1**********', sender);
 
     if(moment().day() === 0) {
-        await sendMessage(text2, '+1515**********', sender);
-        await sendMessage(text2, '+1515**********', sender);
+        await sendMessage(text2, '+1**********', sender);
+        await sendMessage(text2, '+1**********', sender);
     }
 
     const response = {
